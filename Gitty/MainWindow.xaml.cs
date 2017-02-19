@@ -38,7 +38,9 @@ namespace Gitty
             using (var repo = new Repository(@"C:\Users\terryn\Documents\visual studio 2015\Projects\Gitty"))
             {
                 Signature author = new Signature(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value, DateTimeOffset.Now);
-                repo.Commit(CommitDescInput.Text, author, author);
+                repo.Commit(CommitSummaryInput.Text + "\n\n" + CommitDescInput.Text, author, author);
+
+
             }
         }
 
