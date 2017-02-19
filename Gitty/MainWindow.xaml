@@ -85,6 +85,12 @@
             <TabItem Name="CommitTab" Header="Commit">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
+                        <Label>Summary</Label>
+                        <TextBox Name="CommitSummaryInput"></TextBox>
+                        <Label>Description</Label>
+                        <TextBox Name="CommitDescInput"></TextBox>
+                        <Button Name="CommitButton">Commit</Button>
+                        <Separator></Separator>
                         <Label>Staged for Commit</Label>
                         <ListView Name="StagedChanges">
                             <ListView.View>

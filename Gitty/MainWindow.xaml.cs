@@ -30,6 +30,16 @@ namespace Gitty
             LocalRepoList.ItemsSource = listing;
 
             GitActionTabs.SelectionChanged += HandleTabSelected;
+            CommitButton.Click += CommitButton_Click;
+        }
+
+        private void CommitButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (var repo = new Repository(@"C:\Users\terryn\Documents\visual studio 2015\Projects\Gitty"))
+            {
+                Signature author = new Signature(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value, DateTimeOffset.Now);
+                repo.Commit(CommitDescInput.Text, author, author);
+            }
         }
 
         private ChangeEvent.ChangeType ConvertEnumType(FileStatus libType)
@@ -42,20 +52,20 @@ namespace Gitty
                    ((libType & FileStatus.Unaltered) != 0)                                              ? ChangeEvent.ChangeType.UNALTERED :
                                                                                                           ChangeEvent.ChangeType.UNKNOWN;
         }
-        private void HandleTabSelected(Object sender, SelectionChangedEventArgs e)
+        private void HandleTabSelected(object sender, SelectionChangedEventArgs e)
         {
-            if(RepoTab.IsSelected)
+            if (RepoTab.IsSelected)
             {
-                // TODO: need to store the repos somewhere
+
             }
-            else if(LogTab.IsSelected)
+            else if (LogTab.IsSelected)
             {
                 using (var repo = new Repository(@"C:\Users\terryn\Documents\visual studio 2015\Projects\Gitty"))
                 {
                     List<CommitRecord> commits = new List<CommitRecord>();
 
                     int logLimit = 50;
-                    foreach(var com in repo.Commits)
+                    foreach (var com in repo.Commits)
                     {
                         if (--logLimit < 0) { break; }
 
@@ -83,7 +93,7 @@ namespace Gitty
                         unstagedChanges.Add(new ChangeEvent() { Change = ConvertEnumType(chg.State), FilePath = chg.FilePath, Staged = false });
                     }
 
-                    
+
                     // retrieve staged changes
                     var stagedFlags = FileStatus.ModifiedInIndex | FileStatus.DeletedFromIndex | FileStatus.NewInIndex | FileStatus.RenamedInIndex | FileStatus.TypeChangeInIndex;
                     var staged = from chg in status
