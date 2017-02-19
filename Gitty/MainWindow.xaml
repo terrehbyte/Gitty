@@ -1,0 +1,116 @@
+﻿<Window x:Class="Gitty.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Gitty"
+        mc:Ignorable="d"
+        Title="Gitty" Height="350" Width="525">
+    <Window.Resources>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0" Name="MenuBar" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <MenuItem Header="_About">
+                <MenuItem Name="AboutGitty" Header="About _Gitty"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Name="HelpFAQ" Header="_FAQ"/>
+                <MenuItem Name="HelpReport" Header="_Report a Bug"/>
+            </MenuItem>
+        </Menu>
+        
+        <TabControl Grid.Row="1" Name="Tabs">
+            <TabItem Name="RepoTab" Header="Repo">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Label>Local</Label>
+                        <ListView Name="LocalRepoList">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="True">
+                                    <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}"/>
+                                    <GridViewColumn Header="FilePath" Width="300" DisplayMemberBinding="{Binding FilePath}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <DockPanel LastChildFill="False">
+                            <Button>Add</Button>
+                        </DockPanel>
+                        
+                        <Label>Clone</Label>
+                        <TextBlock>Repository URL</TextBlock>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0">Clone URL</TextBox>
+                            <Button Grid.Column="1">Browse</Button>
+                        </Grid>
+                        <TextBlock>Clone Directory</TextBlock>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0">Directory Path</TextBox>
+                            <Button Grid.Column="1">Browse</Button>
+                        </Grid>
+                        <Button>Clone</Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Name="LogTab" Header="Log">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Label>Commit History</Label>
+                        <ListView Name="CommitHistory">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="True">
+                                    <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date}"/>
+                                    <GridViewColumn Header="Author" Width="100" DisplayMemberBinding="{Binding Author}"/>
+                                    <GridViewColumn Header="Summary" Width="320" DisplayMemberBinding="{Binding Summary}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Name="CommitTab" Header="Commit">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Label>Staged for Commit</Label>
+                        <ListView Name="StagedChanges">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="True">
+                                    <GridViewColumn Header="Event" Width="80" DisplayMemberBinding="{Binding ChangeType}"/>
+                                    <GridViewColumn Header="File" Width="100" DisplayMemberBinding="{Binding FilePath}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <Label>Pending Changes</Label>
+                        <ListView Name="UnstagedChanges">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="True">
+                                    <GridViewColumn Header="Event" Width="80" DisplayMemberBinding="{Binding ChangeType}"/>
+                                    <GridViewColumn Header="File" Width="100" DisplayMemberBinding="{Binding FilePath}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+        
+        <!--Status Bar-->
+        <StatusBar Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+            <TextBlock Text="v0.0 by Terry Nguyen"></TextBlock>
+        </StatusBar>
+    </Grid>
+</Window>
