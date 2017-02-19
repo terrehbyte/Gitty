@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using LibGit2Sharp;
+
 namespace Gitty
 {
     public partial class MainWindow : Window
@@ -27,23 +29,80 @@ namespace Gitty
 
             LocalRepoList.ItemsSource = listing;
 
-            List<CommitRecord> history = new List<CommitRecord>();
-            history.Add(new CommitRecord() { Date = "5/5/95", Author = @"Terry Nguyen <terreh@terrehbyte.com>", Summary = "Correct typo in README.md" });
-            history.Add(new CommitRecord() { Date = "5/6/95", Author = @"Terry Nguyen <terreh@terrehbyte.com>", Summary = "Add initial project files" });
+            GitActionTabs.SelectionChanged += HandleTabSelected;
+        }
 
-            CommitHistory.ItemsSource = history;
+        private ChangeEvent.ChangeType ConvertEnumType(FileStatus libType)
+        {
+            return ((libType & (FileStatus.ModifiedInIndex   | FileStatus.ModifiedInWorkdir)) != 0)     ? ChangeEvent.ChangeType.MODIFIED :
+                   ((libType & (FileStatus.DeletedFromIndex  | FileStatus.DeletedFromWorkdir)) != 0)    ? ChangeEvent.ChangeType.DELETED :
+                   ((libType & (FileStatus.NewInIndex        | FileStatus.NewInWorkdir)) != 0)          ? ChangeEvent.ChangeType.ADDED :
+                   ((libType & (FileStatus.RenamedInIndex    | FileStatus.RenamedInWorkdir)) != 0)      ? ChangeEvent.ChangeType.RENAMED :
+                   ((libType & (FileStatus.TypeChangeInIndex | FileStatus.TypeChangeInWorkdir)) != 0)   ? ChangeEvent.ChangeType.TYPED :
+                   ((libType & FileStatus.Unaltered) != 0)                                              ? ChangeEvent.ChangeType.UNALTERED :
+                                                                                                          ChangeEvent.ChangeType.UNKNOWN;
+        }
+        private void HandleTabSelected(Object sender, SelectionChangedEventArgs e)
+        {
+            if(RepoTab.IsSelected)
+            {
+                // TODO: need to store the repos somewhere
+            }
+            else if(LogTab.IsSelected)
+            {
+                using (var repo = new Repository(@"C:\Users\terryn\Documents\visual studio 2015\Projects\Gitty"))
+                {
+                    List<CommitRecord> commits = new List<CommitRecord>();
 
-            List<ChangeEvent> stagedChanges = new List<ChangeEvent>();
-            stagedChanges.Add(new ChangeEvent() { ChangeType = "Add", FilePath = @"README.md" });
-            stagedChanges.Add(new ChangeEvent() { ChangeType = "Remove", FilePath = @"password.txt" });
+                    int logLimit = 50;
+                    foreach(var com in repo.Commits)
+                    {
+                        if (--logLimit < 0) { break; }
 
-            StagedChanges.ItemsSource = stagedChanges;
+                        commits.Add(new CommitRecord() { Date = com.Author.When.Date.ToShortDateString(), Author = com.Author.Name, Summary = com.MessageShort });
+                    }
 
-            List<ChangeEvent> pendingChanges = new List<ChangeEvent>();
-            pendingChanges.Add(new ChangeEvent() { ChangeType = "Modify", FilePath = @"README.md" });
-            pendingChanges.Add(new ChangeEvent() { ChangeType = "Add", FilePath = @"main.cs" });
+                    CommitHistory.ItemsSource = commits;
+                }
+            }
+            else if (CommitTab.IsSelected)
+            {
+                using (var repo = new Repository(@"C:\Users\terryn\Documents\visual studio 2015\Projects\Gitty"))
+                {
+                    var status = repo.RetrieveStatus();
 
-            UnstagedChanges.ItemsSource = pendingChanges;
+                    // retrieve unstaged changes
+                    var unstagedFlags = FileStatus.ModifiedInWorkdir | FileStatus.DeletedFromWorkdir | FileStatus.NewInWorkdir | FileStatus.RenamedInWorkdir | FileStatus.TypeChangeInWorkdir;
+                    var unstaged = from chg in status
+                                   where (chg.State & unstagedFlags) != 0
+                                   select chg;
+
+                    List<ChangeEvent> unstagedChanges = new List<ChangeEvent>();
+                    foreach (var chg in unstaged)
+                    {
+                        unstagedChanges.Add(new ChangeEvent() { Change = ConvertEnumType(chg.State), FilePath = chg.FilePath, Staged = false });
+                    }
+
+                    
+                    // retrieve staged changes
+                    var stagedFlags = FileStatus.ModifiedInIndex | FileStatus.DeletedFromIndex | FileStatus.NewInIndex | FileStatus.RenamedInIndex | FileStatus.TypeChangeInIndex;
+                    var staged = from chg in status
+                                 where (chg.State & stagedFlags) != 0
+                                 select chg;
+
+                    List<ChangeEvent> stagedChanges = new List<ChangeEvent>();
+                    foreach (var chg in staged)
+                    {
+                        stagedChanges.Add(new ChangeEvent() { Change = ConvertEnumType(chg.State), FilePath = chg.FilePath, Staged = true });
+                    }
+
+                    // assign to ui elements
+                    UnstagedChanges.ItemsSource = unstagedChanges;
+                    StagedChanges.ItemsSource = stagedChanges;
+                }
+            }
+
+            e.Handled = true;
         }
     }
 
@@ -62,7 +121,19 @@ namespace Gitty
 
     public class ChangeEvent
     {
-        public string ChangeType { get; set; }
+        public enum ChangeType
+        {
+            MODIFIED,
+            DELETED,
+            ADDED,
+            RENAMED,
+            TYPED,
+            UNALTERED,
+            UNKNOWN
+        }
+
+        public bool Staged { get; set; }
+        public ChangeType Change { get; set; }
         public string FilePath { get; set; }
     }
 }

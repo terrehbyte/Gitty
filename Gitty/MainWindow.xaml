@@ -26,7 +26,7 @@
             </MenuItem>
         </Menu>
         
-        <TabControl Grid.Row="1" Name="Tabs">
+        <TabControl Name="GitActionTabs" Grid.Row="1">
             <TabItem Name="RepoTab" Header="Repo">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
@@ -89,7 +89,7 @@
                         <ListView Name="StagedChanges">
                             <ListView.View>
                                 <GridView AllowsColumnReorder="True">
-                                    <GridViewColumn Header="Event" Width="80" DisplayMemberBinding="{Binding ChangeType}"/>
+                                    <GridViewColumn Header="Change" Width="80" DisplayMemberBinding="{Binding Change}"/>
                                     <GridViewColumn Header="File" Width="100" DisplayMemberBinding="{Binding FilePath}"/>
                                 </GridView>
                             </ListView.View>
@@ -98,7 +98,7 @@
                         <ListView Name="UnstagedChanges">
                             <ListView.View>
                                 <GridView AllowsColumnReorder="True">
-                                    <GridViewColumn Header="Event" Width="80" DisplayMemberBinding="{Binding ChangeType}"/>
+                                    <GridViewColumn Header="Change" Width="80" DisplayMemberBinding="{Binding Change}"/>
                                     <GridViewColumn Header="File" Width="100" DisplayMemberBinding="{Binding FilePath}"/>
                                 </GridView>
                             </ListView.View>
