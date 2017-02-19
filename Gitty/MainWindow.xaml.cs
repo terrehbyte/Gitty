@@ -40,7 +40,8 @@ namespace Gitty
                 Signature author = new Signature(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value, DateTimeOffset.Now);
                 repo.Commit(CommitSummaryInput.Text + "\n\n" + CommitDescInput.Text, author, author);
 
-
+                CommitSummaryInput.Clear();
+                CommitDescInput.Clear();
             }
         }
 
